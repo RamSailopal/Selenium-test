@@ -1,0 +1,28 @@
+name: Build, test and push image
+
+on:
+  # run it on push to the default repository branch (main)
+  push:
+    branches: [main]
+  # run it during pull request
+  pull_request:
+
+jobs:
+  Run_IaC:
+    runs-on: ubuntu-latest
+
+    # steps to perform in job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build the image
+        run: |
+          docker build --rm --no-cache -t ramb0/selenium-test .
+      - name: Push the image
+        env:
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          docker login -u="$DOCKER_USER" -p="$DOCKER_PASS"
+          docker push ramb0/selenium-test
